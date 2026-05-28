@@ -2,6 +2,20 @@
 
 Enterprise-style logistics analytics platform for shipment pricing, revenue forecasting, explainable AI, and business intelligence.
 
+## Project Structure
+
+```
+logistics-ai-platform/
+│
+├── app.py
+├── scripts/
+├── data/
+├── models/
+├── utils/
+├── dashboard/
+└── notebooks/
+```
+
 ## Tech Stack
 - Python
 - Streamlit

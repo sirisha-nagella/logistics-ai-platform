@@ -7,6 +7,7 @@ df = load_data("data/supply_chain_data.csv")
 
 df.columns = (
     df.columns
+    .str.replace("ï»¿", "", regex=False)
     .str.strip()
     .str.lower()
     .str.replace(" ","_")
@@ -19,7 +20,7 @@ print("\nData Types:")
 print(df.dtypes)
 
 print("\nSummary Statistics:")
-print(df.descripbe())
+print(df.describe())
 
 df.to_csv("data/cleaned_supply_chain_data.csv", index=False)
 

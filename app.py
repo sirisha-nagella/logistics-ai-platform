@@ -4,7 +4,8 @@ from utils.data_loader import load_data
 from dashboard.kpi_calculator import calculate_kpis
 from dashboard.charts import (
     revenue_by_country,
-    revenue_by_shipment_mode
+    revenue_by_shipment_mode,
+    monthly_revenue_trend
 )
 from dashboard.filters import apply_filters
 
@@ -70,5 +71,17 @@ shipment_fig = revenue_by_shipment_mode(df)
 
 st.plotly_chart(
     shipment_fig,
+    width="stretch"
+)
+
+
+st.divider()
+
+st.subheader("Revenue Trend")
+
+trend_fig = monthly_revenue_trend(df)
+
+st.plotly_chart(
+    trend_fig,
     width="stretch"
 )

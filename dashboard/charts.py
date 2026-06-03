@@ -1,3 +1,4 @@
+import pandas as pd
 import plotly.express as px
 
 
@@ -57,6 +58,49 @@ def revenue_by_shipment_mode(df):
         x="shipment_mode",
         y="revenue_millions",
         title="Revenue by Shipment Mode"
+    )
+
+    return fig
+
+
+def monthly_revenue_trend(df):
+
+    trend_df = df.copy()
+
+    trend_df["delivery_recorded_date"] = pd.to_datetime(
+        trend_df["delivery_recorded_date"],
+        format="%d-%b-%y",
+        errors="coerce"
+    )
+
+    trend_df = trend_df.dropna(
+        subset=["delivery_recorded_date"]
+    )
+
+    trend_df["year_month"] = (
+        trend_df["delivery_recorded_date"]
+        .dt.to_period("M")
+        .astype(str)
+    )
+
+    monthly_revenue = (
+        trend_df.groupby(
+            "year_month",
+            as_index=False
+        )["line_item_value"]
+        .sum()
+    )
+
+    monthly_revenue["revenue_millions"] = (
+        monthly_revenue["line_item_value"]
+        / 1_000_000
+    )
+
+    fig = px.line(
+        monthly_revenue,
+        x="year_month",
+        y="revenue_millions",
+        title="Monthly Revenue Trend (Millions USD)"
     )
 
     return fig

@@ -6,6 +6,7 @@ from dashboard.charts import (
     revenue_by_country,
     revenue_by_shipment_mode
 )
+from dashboard.filters import apply_filters
 
 
 st.set_page_config(
@@ -17,6 +18,12 @@ st.title("🚚 Logistics Pricing & Revenue Intelligence")
 
 
 df = load_data("data/supply_chain_data.csv")
+
+df = apply_filters(df)
+
+st.caption(
+    f"Filtered Records: {len(df):,}"
+)
 
 kpis = calculate_kpis(df)
 

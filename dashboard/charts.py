@@ -39,7 +39,8 @@ def revenue_by_country(df):
 def revenue_by_shipment_mode(df):
 
     shipment_df = (
-        df.groupby("shipment_mode", as_index=False)["line_item_value"]
+        df.assign(shipment_mode=df["shipment_mode"].fillna("Unknown"))
+        .groupby("shipment_mode", as_index=False)["line_item_value"]
         .sum()
         .sort_values(
             by="line_item_value",

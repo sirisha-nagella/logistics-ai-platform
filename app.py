@@ -77,7 +77,7 @@ st.plotly_chart(
 
 st.divider()
 
-st.subheader("Revenue Trend")
+st.subheader("Revenue Trends")
 
 trend_fig = monthly_revenue_trend(df)
 

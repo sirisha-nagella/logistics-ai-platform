@@ -80,7 +80,7 @@ def monthly_revenue_trend(df):
     trend_df["year_month"] = (
         trend_df["delivery_recorded_date"]
         .dt.to_period("M")
-        .astype(str)
+        .dt.to_timestamp()
     )
 
     monthly_revenue = (
@@ -101,6 +101,12 @@ def monthly_revenue_trend(df):
         x="year_month",
         y="revenue_millions",
         title="Monthly Revenue Trend (Millions USD)"
+    )
+
+
+    fig.update_layout(
+        xaxis_title="Month",
+        yaxis_title="Revenue (Millions USD)"
     )
 
     return fig

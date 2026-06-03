@@ -2,7 +2,10 @@ import streamlit as st
 
 from utils.data_loader import load_data
 from dashboard.kpi_calculator import calculate_kpis
-from dashboard.charts import revenue_by_country
+from dashboard.charts import (
+    revenue_by_country,
+    revenue_by_shipment_mode
+)
 
 
 st.set_page_config(
@@ -53,5 +56,12 @@ country_fig = revenue_by_country(df)
 
 st.plotly_chart(
     country_fig,
+    width="stretch"
+)
+
+shipment_fig = revenue_by_shipment_mode(df)
+
+st.plotly_chart(
+    shipment_fig,
     width="stretch"
 )

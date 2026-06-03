@@ -36,3 +36,28 @@ def revenue_by_country(df):
     return fig
 
 
+def revenue_by_shipment_mode(df):
+
+    shipment_df = (
+        df.groupby("shipment_mode", as_index=False)["line_item_value"]
+        .sum()
+        .sort_values(
+            by="line_item_value",
+            ascending=False
+        )
+    )
+
+    shipment_df["revenue_millions"] = (
+        shipment_df["line_item_value"] / 1_000_000
+    )
+
+    fig = px.bar(
+        shipment_df,
+        x="shipment_mode",
+        y="revenue_millions",
+        title="Revenue by Shipment Mode"
+    )
+
+    return fig
+
+

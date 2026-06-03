@@ -24,4 +24,15 @@ def revenue_by_country(df):
         title="Top 10 Countries by Revenue (Millions USD)"
     )
 
+    fig.update_layout(
+        xaxis_title="Country",
+        yaxis_title="Revenue (Millions USD)"
+    )
+
+    fig.update_xaxes(
+        tickangle=-30
+    )
+
     return fig
+
+

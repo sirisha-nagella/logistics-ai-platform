@@ -1,11 +1,12 @@
 import streamlit as st
 
 from utils.data_loader import load_data
-from dashboard.kpi_calculator import calculate_kpis
+from dashboard.kpi_calculator import calculate_kpis, calculate_freight_ratio
 from dashboard.charts import (
     revenue_by_country,
     revenue_by_shipment_mode,
-    monthly_revenue_trend
+    monthly_revenue_trend,
+    monthly_freight_cost_trend
 )
 from dashboard.filters import apply_filters
 
@@ -29,7 +30,7 @@ st.caption(
 kpis = calculate_kpis(df)
 
 
-col1, col2, col3, col4 = st.columns(4)
+col1, col2, col3, col4, col5 = st.columns(5)
 
 with col1:
     st.metric(
@@ -53,6 +54,12 @@ with col4:
     st.metric(
         "Countries",
         kpis["total_countries"]
+    )
+
+with col5:
+    st.metric(
+        "Freight Cost %",
+        f"{calculate_freight_ratio(df):.2f}%"
     )
 
 
@@ -83,5 +90,12 @@ trend_fig = monthly_revenue_trend(df)
 
 st.plotly_chart(
     trend_fig,
+    width="stretch"
+)
+
+freight_trend_fig = monthly_freight_cost_trend(df)
+
+st.plotly_chart(
+    freight_trend_fig,
     width="stretch"
 )

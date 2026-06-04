@@ -112,3 +112,57 @@ def monthly_revenue_trend(df):
     return fig
 
 
+def monthly_freight_cost_trend(df):
+
+    trend_df = df.copy()
+
+    trend_df["delivery_recorded_date"] = pd.to_datetime(
+        trend_df["delivery_recorded_date"],
+        format="%d-%b-%y",
+        errors="coerce"
+    )
+
+    trend_df = trend_df.dropna(
+        subset=["delivery_recorded_date"]
+    )
+
+    trend_df["freight_cost_(usd)"] = pd.to_numeric(
+        trend_df["freight_cost_(usd)"],
+        errors="coerce"
+    )
+
+    trend_df["year_month"] = (
+        trend_df["delivery_recorded_date"]
+        .dt.to_period("M")
+        .dt.to_timestamp()
+    )
+
+    monthly_freight = (
+        trend_df.groupby(
+            "year_month",
+            as_index=False
+        )["freight_cost_(usd)"]
+        .sum()
+    )
+
+    monthly_freight["freight_millions"] = (
+        monthly_freight["freight_cost_(usd)"]
+        / 1_000_000
+    )
+
+    fig = px.line(
+        monthly_freight,
+        x="year_month",
+        y="freight_millions",
+        title="Monthly Freight Cost Trend (Millions USD)"
+    )
+
+
+    fig.update_layout(
+        xaxis_title="Month",
+        yaxis_title="Freight Cost (Millions USD)"
+    )
+
+    return fig
+
+

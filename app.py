@@ -6,9 +6,18 @@ from dashboard.charts import (
     revenue_by_country,
     revenue_by_shipment_mode,
     monthly_revenue_trend,
-    monthly_freight_cost_trend
+    monthly_freight_cost_trend,
+    spike_country_chart,
+    spike_vendor_chart,
+    spike_shipment_chart
 )
 from dashboard.filters import apply_filters
+from dashboard.investigation import (
+    get_month_data,
+    top_countries_for_month,
+    top_vendors_for_month,
+    shipment_mode_breakdown
+)
 
 
 st.set_page_config(
@@ -97,5 +106,69 @@ freight_trend_fig = monthly_freight_cost_trend(df)
 
 st.plotly_chart(
     freight_trend_fig,
+    width="stretch"
+)
+
+
+st.divider()
+
+st.subheader("Revenue Spike Investigation")
+
+available_months = [
+    "2011-09",
+    "2014-06",
+    "2015-03"
+]
+
+selected_month = st.selectbox(
+    "Select Spike Month",
+    available_months
+)
+
+month_df = get_month_data(
+    df,
+    selected_month
+)
+
+st.write(
+    f"Records analyzed: {len(month_df):,}"
+)
+
+country_analysis = top_countries_for_month(
+    month_df
+)
+
+st.subheader(
+    "Top Countries Driving Revenue"
+)
+
+st.plotly_chart(
+    spike_country_chart(country_analysis),
+    width="stretch"
+)
+
+vendor_analysis = top_vendors_for_month(
+    month_df
+)
+
+st.subheader(
+    "Top Vendors Driving Revenue"
+)
+
+st.plotly_chart(
+    spike_vendor_chart(vendor_analysis),
+    width="stretch"
+)
+
+shipment_analysis = shipment_mode_breakdown(
+    month_df
+)
+
+st.subheader(
+    "Shipment Mode Contribution"
+)
+
+st.plotly_chart(
+    spike_shipment_chart(shipment_analysis),
     width="stretch"
 )

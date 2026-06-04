@@ -166,3 +166,80 @@ def monthly_freight_cost_trend(df):
     return fig
 
 
+def spike_country_chart(country_df):
+
+    chart_df = country_df.copy()
+
+    chart_df["revenue_millions"] = (
+        chart_df["line_item_value"] / 1_000_000
+    )
+
+    fig = px.bar(
+        chart_df,
+        x="country",
+        y="revenue_millions",
+        title="Top Countries Driving Revenue (Millions USD)"
+    )
+
+    fig.update_layout(
+        xaxis_title="Country",
+        yaxis_title="Revenue (Millions USD)"
+    )
+
+    fig.update_xaxes(
+        tickangle=-30
+    )
+
+    return fig
+
+
+def spike_vendor_chart(vendor_df):
+
+    chart_df = vendor_df.copy()
+
+    chart_df["revenue_millions"] = (
+        chart_df["line_item_value"] / 1_000_000
+    )
+
+    fig = px.bar(
+        chart_df,
+        x="vendor",
+        y="revenue_millions",
+        title="Top Vendors Driving Revenue (Millions USD)"
+    )
+
+    fig.update_layout(
+        xaxis_title="Vendor",
+        yaxis_title="Revenue (Millions USD)"
+    )
+
+    fig.update_xaxes(
+        tickangle=-30
+    )
+
+    return fig
+
+
+def spike_shipment_chart(shipment_df):
+
+    chart_df = shipment_df.copy()
+
+    chart_df["revenue_millions"] = (
+        chart_df["line_item_value"] / 1_000_000
+    )
+
+    fig = px.bar(
+        chart_df,
+        x="shipment_mode",
+        y="revenue_millions",
+        title="Shipment Mode Contribution (Millions USD)"
+    )
+
+    fig.update_layout(
+        xaxis_title="Shipment Mode",
+        yaxis_title="Revenue (Millions USD)"
+    )
+
+    return fig
+
+

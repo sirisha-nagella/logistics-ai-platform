@@ -272,31 +272,23 @@ def product_group_chart(df):
 
 def vendor_pareto_chart(df):
 
-    # Top 15 vendors keeps the x-axis readable (there are ~73 total)
+    # Cumulative concentration curve across all vendors, ranked by revenue
 
-    chart_df = df.head(15).copy()
+    chart_df = df.copy()
 
-    fig = px.bar(
+    chart_df["vendor_rank"] = range(1, len(chart_df) + 1)
+
+    fig = px.line(
         chart_df,
-        x="vendor",
-        y="pct",
+        x="vendor_rank",
+        y="cumulative_pct",
+        markers=True,
         title="Vendor Revenue Contribution"
     )
 
-    fig.add_scatter(
-        x=chart_df["vendor"],
-        y=chart_df["cumulative_pct"],
-        mode="lines+markers",
-        name="Cumulative %"
-    )
-
     fig.update_layout(
-        xaxis_title="Vendor",
-        yaxis_title="Revenue Share (%)"
-    )
-
-    fig.update_xaxes(
-        tickangle=-45
+        xaxis_title="Vendor Rank",
+        yaxis_title="Cumulative Revenue %"
     )
 
     return fig
@@ -328,6 +320,33 @@ def country_share_chart(df):
 
     fig.update_xaxes(
         tickangle=-30
+    )
+
+    return fig
+
+
+def product_group_share_chart(df):
+
+    chart_df = df.copy()
+
+    chart_df["share_label"] = (
+        chart_df["share_pct"]
+        .round(1)
+        .astype(str)
+        + "%"
+    )
+
+    fig = px.bar(
+        chart_df,
+        x="product_group",
+        y="share_pct",
+        text="share_label",
+        title="Product Group Revenue Share"
+    )
+
+    fig.update_layout(
+        xaxis_title="Product Group",
+        yaxis_title="Revenue Share (%)"
     )
 
     return fig

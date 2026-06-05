@@ -85,3 +85,40 @@ def vendor_pareto(df):
     return vendor_df
 
 
+def product_group_share(df):
+
+    group_df = (
+        df.groupby("product_group", as_index=False)
+        ["line_item_value"]
+        .sum()
+    )
+
+    total_revenue = (
+        group_df["line_item_value"]
+        .sum()
+    )
+
+    group_df["share_pct"] = (
+        group_df["line_item_value"]
+        / total_revenue
+        * 100
+    )
+
+    return group_df.sort_values(
+        by="share_pct",
+        ascending=False
+    )
+
+
+def classify_risk(share):
+
+    if share >= 80:
+        return "High"
+
+    elif share >= 50:
+        return "Medium"
+
+    else:
+        return "Low"
+
+

@@ -9,7 +9,10 @@ from dashboard.charts import (
     monthly_freight_cost_trend,
     spike_country_chart,
     spike_vendor_chart,
-    spike_shipment_chart
+    spike_shipment_chart,
+    product_group_chart,
+    vendor_pareto_chart,
+    country_share_chart
 )
 from dashboard.filters import apply_filters
 from dashboard.investigation import (
@@ -17,6 +20,11 @@ from dashboard.investigation import (
     top_countries_for_month,
     top_vendors_for_month,
     shipment_mode_breakdown
+)
+from dashboard.driver_analysis import (
+    revenue_by_product_group,
+    vendor_pareto,
+    country_revenue_share
 )
 
 
@@ -170,5 +178,74 @@ st.subheader(
 
 st.plotly_chart(
     spike_shipment_chart(shipment_analysis),
+    width="stretch"
+)
+
+
+st.divider()
+
+st.header(
+    "Revenue Driver Analysis"
+)
+
+# Ranked driver tables (reused for the summary card and the charts):
+
+country_df = country_revenue_share(df)
+
+vendor_df = vendor_pareto(df)
+
+product_group_df = revenue_by_product_group(df)
+
+# Top driver per dimension (first row of each ranked table):
+
+top_country = country_df.iloc[0]
+
+top_vendor = vendor_df.iloc[0]
+
+top_product_group = product_group_df.iloc[0]
+
+st.subheader("Top Revenue Driver Summary")
+
+driver_col1, driver_col2, driver_col3 = st.columns(3)
+
+with driver_col1:
+    st.metric(
+        "Country",
+        top_country["country"],
+        f"{top_country['revenue_share_pct']:.1f}% of revenue"
+    )
+
+with driver_col2:
+    st.metric(
+        "Vendor",
+        top_vendor["vendor"],
+        f"${top_vendor['line_item_value']:,.0f}"
+    )
+
+with driver_col3:
+    st.metric(
+        "Product Group",
+        top_product_group["product_group"],
+        f"${top_product_group['line_item_value']:,.0f}"
+    )
+
+st.subheader("Product Group Revenue")
+
+st.plotly_chart(
+    product_group_chart(product_group_df),
+    width="stretch"
+)
+
+st.subheader("Vendor Concentration")
+
+st.plotly_chart(
+    vendor_pareto_chart(vendor_df),
+    width="stretch"
+)
+
+st.subheader("Country Revenue Share")
+
+st.plotly_chart(
+    country_share_chart(country_df),
     width="stretch"
 )

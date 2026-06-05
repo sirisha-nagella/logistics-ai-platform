@@ -243,3 +243,93 @@ def spike_shipment_chart(shipment_df):
     return fig
 
 
+def product_group_chart(df):
+
+    chart_df = df.head(10).copy()
+
+    chart_df["revenue_millions"] = (
+        chart_df["line_item_value"] / 1_000_000
+    )
+
+    fig = px.bar(
+        chart_df,
+        x="product_group",
+        y="revenue_millions",
+        title="Top 10 Product Groups by Revenue (Millions USD)"
+    )
+
+    fig.update_layout(
+        xaxis_title="Product Group",
+        yaxis_title="Revenue (Millions USD)"
+    )
+
+    fig.update_xaxes(
+        tickangle=-30
+    )
+
+    return fig
+
+
+def vendor_pareto_chart(df):
+
+    # Top 15 vendors keeps the x-axis readable (there are ~73 total)
+
+    chart_df = df.head(15).copy()
+
+    fig = px.bar(
+        chart_df,
+        x="vendor",
+        y="pct",
+        title="Vendor Revenue Contribution"
+    )
+
+    fig.add_scatter(
+        x=chart_df["vendor"],
+        y=chart_df["cumulative_pct"],
+        mode="lines+markers",
+        name="Cumulative %"
+    )
+
+    fig.update_layout(
+        xaxis_title="Vendor",
+        yaxis_title="Revenue Share (%)"
+    )
+
+    fig.update_xaxes(
+        tickangle=-45
+    )
+
+    return fig
+
+
+def country_share_chart(df):
+
+    chart_df = df.head(10).copy()
+
+    chart_df["share_label"] = (
+        chart_df["revenue_share_pct"]
+        .round(1)
+        .astype(str)
+        + "%"
+    )
+
+    fig = px.bar(
+        chart_df,
+        x="country",
+        y="revenue_share_pct",
+        text="share_label",
+        title="Top 10 Countries by Revenue Share"
+    )
+
+    fig.update_layout(
+        xaxis_title="Country",
+        yaxis_title="Revenue Share (%)"
+    )
+
+    fig.update_xaxes(
+        tickangle=-30
+    )
+
+    return fig
+
+

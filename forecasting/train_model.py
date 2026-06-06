@@ -1,19 +1,20 @@
+import os
+
 import pandas as pd
 import matplotlib.pyplot as plt
 
 from xgboost import XGBRegressor
-from sklearn.metrics import (
-    mean_absolute_error,
-    mean_squared_error,
-    mean_absolute_percentage_error
-)
 
 from forecasting.feature_engineering import (
     create_time_features,
     create_lag_features,
     create_rolling_features,
-    create_trend_feature
+    create_trend_feature,
+    FEATURE_COLUMNS
 )
+from forecasting.evaluate import evaluate_predictions, format_metrics
+
+MODEL_PATH = "models/xgb_revenue.json"
 
 # Load the monthly revenue dataset
 
@@ -37,18 +38,9 @@ df = create_rolling_features(df)
 
 df = create_trend_feature(df)
 
-# Create features:
+# Features (shared with predict.py via feature_engineering.FEATURE_COLUMNS):
 
-feature_columns = [
-    "year",
-    "month",
-    "quarter",
-    "lag_1",
-    "lag_3",
-    "lag_12",
-    "rolling_mean_3",
-    "rolling_mean_6"
-]
+feature_columns = FEATURE_COLUMNS
 
 # Remove NaNs (lag columns leave gaps at the start):
 
@@ -124,13 +116,26 @@ print(train_df[feature_columns].head())
 
 print(train_df[feature_columns].isna().sum())
 
-# Prediction (naive baseline: predict each month as the previous month):
+# Model predictions, plus a naive baseline (predict each month as the
+# previous month) so we can show the model actually beats carry-forward:
 
-predictions = X_test["lag_1"]
+predictions = model.predict(X_test)
+
+baseline = X_test["lag_1"]
 
 results = test_df.copy()
 
 results["predicted_revenue"] = predictions
+
+results["baseline_revenue"] = baseline.values
+
+# Persist the trained model so predict.py / the app can load it:
+
+os.makedirs(os.path.dirname(MODEL_PATH), exist_ok=True)
+
+model.save_model(MODEL_PATH)
+
+print(f"\nModel saved to {MODEL_PATH}")
 
 # Plot
 
@@ -144,7 +149,13 @@ plt.plot(
 plt.plot(
     results["date"],
     results["predicted_revenue"],
-    label="predicted"
+    label="Predicted (XGBoost)"
+)
+plt.plot(
+    results["date"],
+    results["baseline_revenue"],
+    label="Baseline (lag_1)",
+    linestyle="--"
 )
 
 plt.legend()
@@ -153,23 +164,14 @@ plt.title("Actual vs Predicted Revenue")
 
 plt.show()
 
-# Evaluation:
+# Evaluation: report the model and the baseline side by side.
 
-mae = mean_absolute_error(
-    y_test,
-    predictions
-)
+model_metrics = evaluate_predictions(y_test, predictions)
 
-rmse = mean_squared_error(
-    y_test,
-    predictions
-) ** 0.5
+baseline_metrics = evaluate_predictions(y_test, baseline)
 
-mape = mean_absolute_percentage_error(
-    y_test,
-    predictions
-) * 100
+print("\nXGBoost model:")
+print(format_metrics(model_metrics))
 
-print(f"MAE: ${mae:,.2f}")
-print(f"RMSE: ${rmse:,.2f}")
-print(f"MAPE: {mape:.2f}%")
+print("\nNaive baseline (lag_1):")
+print(format_metrics(baseline_metrics))

@@ -48,6 +48,15 @@ st.caption(
     f"Filtered Records: {len(df):,}"
 )
 
+# Stop early on an empty selection so downstream .iloc[0] / divisions don't
+# crash with a raw traceback when filters match no records.
+if df.empty:
+    st.warning(
+        "No records match the selected filters. "
+        "Adjust the filters in the sidebar to continue."
+    )
+    st.stop()
+
 kpis = calculate_kpis(df)
 
 

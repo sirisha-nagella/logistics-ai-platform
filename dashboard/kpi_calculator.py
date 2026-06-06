@@ -29,12 +29,25 @@ def calculate_kpis(df):
 
 def calculate_freight_ratio(df):
 
-    revenue = df["line_item_value"].fillna(0).sum()
+    # ~40% of rows carry non-numeric freight values (e.g. "Freight Included
+    # in Commodity Cost", "Invoiced Separately"). Coercing those to 0 and
+    # dividing by total revenue understates the ratio, because the numerator
+    # drops those shipments while the denominator keeps them. Compare freight
+    # against revenue for the SAME shipments: those with a real freight value.
 
-    freight = (
-        pd.to_numeric(df["freight_cost_(usd)"], errors="coerce")
+    freight = pd.to_numeric(df["freight_cost_(usd)"], errors="coerce")
+
+    has_freight = freight.notna()
+
+    freight_total = freight[has_freight].sum()
+
+    revenue_total = (
+        df.loc[has_freight, "line_item_value"]
         .fillna(0)
         .sum()
     )
 
-    return (freight / revenue) * 100
+    if revenue_total == 0:
+        return 0.0
+
+    return (freight_total / revenue_total) * 100

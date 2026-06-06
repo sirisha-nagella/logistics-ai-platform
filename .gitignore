@@ -7,3 +7,6 @@ __pycache__/
 
 # Generated/derived data artifacts
 data/cleaned_supply_chain_data.csv
+
+# Trained model artifacts
+models/

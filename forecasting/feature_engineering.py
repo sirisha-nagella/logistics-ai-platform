@@ -1,5 +1,33 @@
 import pandas as pd
 
+# Single source of truth for the columns the model trains and predicts on.
+# Keeping this here prevents train/predict feature drift.
+FEATURE_COLUMNS = [
+    "year",
+    "month",
+    "quarter",
+    "lag_1",
+    "lag_3",
+    "lag_12",
+    "rolling_mean_3",
+    "rolling_mean_6",
+]
+
+
+def build_features(monthly_df):
+    """Build the full feature frame from a monthly revenue dataframe.
+
+    Expects a ``date`` (datetime) and ``revenue`` column. Returns the frame
+    with all engineered features and rows containing NaN lags dropped.
+    """
+
+    df = create_time_features(monthly_df)
+    df = create_lag_features(df)
+    df = create_rolling_features(df)
+    df = create_trend_feature(df)
+
+    return df.dropna()
+
 
 def create_time_features(df):
 

@@ -1,0 +1,36 @@
+Total Revenue: $1.628B
+Total Freight Cost: $68.8M
+Freight cost represents about 4.2% of total revenue.
+Total Units Shipped: 189.3M
+The data covers 43 countries.
+
+Nigeria contributes 21.5% of total revenue and is the top country.
+Zambia is the second largest country at 15.2% of total revenue.
+Mozambique is the third largest country at 11.2% of total revenue.
+Top 5 countries account for 63.3% of total revenue.
+
+SCMS from RDC contributes 66.7% (about $1.085B) of total revenue and is the top vendor.
+Top 5 vendors account for 88.4% of total revenue.
+There are 73 vendors, but just 3 vendors make up about 81% of revenue.
+
+ARV products contribute 86.8% (about $1.413B) of total revenue and are the top product group.
+HRDT products are the second largest group at 13.1% of total revenue.
+The top 2 product groups (ARV and HRDT) make up 99.9% of total revenue.
+The top 5 product groups account for 100% of total revenue.
+
+Air is the highest-revenue shipment mode at $627.3M, followed by Truck at $587.4M.
+
+Revenue is highly concentrated across both vendor and product dimensions.
+Vendor dependency risk is Medium (top vendor share 66.7%).
+Product dependency risk is High (top product group share 86.8%).
+Country dependency risk is Low (top country share 21.5%).
+The custom revenue dependency score is 76.8, indicating high concentration risk.
+
+September shows the strongest seasonal revenue pattern.
+March is also among the strongest revenue months.
+January shows the weakest seasonal revenue pattern.
+
+Major revenue spikes occurred in:
+- September 2011
+- June 2014
+- March 2015

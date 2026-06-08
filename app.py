@@ -1,4 +1,5 @@
 import streamlit as st
+import pandas as pd
 
 from utils.data_loader import load_data
 from dashboard.kpi_calculator import calculate_kpis, calculate_freight_ratio
@@ -9,7 +10,11 @@ from dashboard.charts import (
     monthly_freight_cost_trend,
     spike_country_chart,
     spike_vendor_chart,
-    spike_shipment_chart
+    spike_shipment_chart,
+    product_group_chart,
+    vendor_pareto_chart,
+    country_share_chart,
+    product_group_share_chart
 )
 from dashboard.filters import apply_filters
 from dashboard.investigation import (
@@ -17,6 +22,13 @@ from dashboard.investigation import (
     top_countries_for_month,
     top_vendors_for_month,
     shipment_mode_breakdown
+)
+from dashboard.driver_analysis import (
+    revenue_by_product_group,
+    vendor_pareto,
+    country_revenue_share,
+    product_group_share,
+    classify_risk
 )
 
 
@@ -172,3 +184,285 @@ st.plotly_chart(
     spike_shipment_chart(shipment_analysis),
     width="stretch"
 )
+
+
+st.divider()
+
+st.header(
+    "Revenue Driver Analysis"
+)
+
+# Ranked driver tables (reused for the summary card and the charts):
+
+country_df = country_revenue_share(df)
+
+vendor_df = vendor_pareto(df)
+
+product_group_df = revenue_by_product_group(df)
+
+# Top driver per dimension (first row of each ranked table):
+
+top_country = country_df.iloc[0]
+
+top_vendor = vendor_df.iloc[0]
+
+top_product_group = product_group_df.iloc[0]
+
+st.subheader("Top Revenue Driver Summary")
+
+driver_col1, driver_col2, driver_col3 = st.columns(3)
+
+with driver_col1:
+    st.metric(
+        "Country",
+        top_country["country"],
+        f"{top_country['revenue_share_pct']:.1f}% of revenue"
+    )
+
+with driver_col2:
+    st.metric(
+        "Vendor",
+        top_vendor["vendor"],
+        f"${top_vendor['line_item_value']:,.0f}"
+    )
+
+with driver_col3:
+    st.metric(
+        "Product Group",
+        top_product_group["product_group"],
+        f"${top_product_group['line_item_value']:,.0f}"
+    )
+
+st.subheader("Product Group Revenue")
+
+st.plotly_chart(
+    product_group_chart(product_group_df),
+    width="stretch"
+)
+
+st.subheader("Vendor Concentration")
+
+st.plotly_chart(
+    vendor_pareto_chart(vendor_df),
+    width="stretch"
+)
+
+st.subheader("Country Revenue Share")
+
+st.plotly_chart(
+    country_share_chart(country_df),
+    width="stretch",
+    key="country_share_drivers"
+)
+
+
+st.divider()
+
+st.header(
+    "Revenue Concentration Analysis"
+)
+
+product_group_share_df = product_group_share(df)
+
+# Top driver share of total revenue per dimension:
+
+top_country_share = top_country["revenue_share_pct"]
+
+top_vendor_share = top_vendor["pct"]
+
+top_product_group_share = (
+    product_group_share_df.iloc[0]["share_pct"]
+)
+
+# Combined share of the top 5 drivers per dimension:
+
+top_5_country_share = (
+    country_df.head(5)["revenue_share_pct"].sum()
+)
+
+top_5_vendor_share = (
+    vendor_df.head(5)["pct"].sum()
+)
+
+top_5_product_group_share = (
+    product_group_share_df.head(5)["share_pct"].sum()
+)
+
+# Custom KPI (not industry-standard) — higher means more concentration risk:
+
+dependency_score = (
+    top_vendor_share
+    + top_product_group_share
+) / 2
+
+conc_col1, conc_col2, conc_col3 = st.columns(3)
+
+with conc_col1:
+    st.metric(
+        "Top Country",
+        top_country["country"],
+        f"{top_country_share:.1f}%"
+    )
+
+with conc_col2:
+    st.metric(
+        "Top Vendor",
+        top_vendor["vendor"],
+        f"{top_vendor_share:.1f}%"
+    )
+
+with conc_col3:
+    st.metric(
+        "Top Product Group",
+        top_product_group["product_group"],
+        f"{top_product_group_share:.1f}%"
+    )
+
+st.subheader("Top 5 Concentration")
+
+top5_col1, top5_col2, top5_col3 = st.columns(3)
+
+with top5_col1:
+    st.metric(
+        "Top 5 Countries",
+        f"{top_5_country_share:.1f}%"
+    )
+
+with top5_col2:
+    st.metric(
+        "Top 5 Vendors",
+        f"{top_5_vendor_share:.1f}%"
+    )
+
+with top5_col3:
+    st.metric(
+        "Top 5 Product Groups",
+        f"{top_5_product_group_share:.1f}%"
+    )
+
+st.subheader("Revenue Dependency Score")
+
+st.metric(
+    "Dependency Score",
+    f"{dependency_score:.1f}"
+)
+
+st.caption(
+    "Custom metric (avg of top vendor and top product group share). "
+    "Higher score = higher concentration risk."
+)
+
+st.subheader("Top 10 Countries by Revenue %")
+
+st.plotly_chart(
+    country_share_chart(country_df),
+    width="stretch",
+    key="country_share_top10"
+)
+
+st.subheader("Product Group Revenue Share")
+
+st.plotly_chart(
+    product_group_share_chart(product_group_share_df),
+    width="stretch"
+)
+
+st.subheader(
+    "Key Business Insights"
+)
+
+st.markdown(
+    f"""
+- {top_country['country']} contributes {top_country_share:.1f}% of total revenue.
+- {top_vendor['vendor']} contributes {top_vendor_share:.1f}% of total revenue.
+- {top_product_group['product_group']} products account for {top_product_group_share:.1f}% of total revenue.
+- Revenue appears highly concentrated across both vendor and product dimensions.
+"""
+)
+
+
+st.divider()
+
+st.header(
+    "Executive Revenue Intelligence"
+)
+
+st.subheader("Revenue Concentration Scorecard")
+
+scorecard_df = pd.DataFrame(
+    {
+        "KPI": [
+            "Top Vendor Share",
+            "Top Product Share",
+            "Top Country Share",
+            "Top 5 Vendor Share",
+            "Top 5 Country Share"
+        ],
+        "Value": [
+            f"{top_vendor_share:.1f}%",
+            f"{top_product_group_share:.1f}%",
+            f"{top_country_share:.1f}%",
+            f"{top_5_vendor_share:.1f}%",
+            f"{top_5_country_share:.1f}%"
+        ]
+    }
+)
+
+st.table(scorecard_df)
+
+st.subheader("Risk Classification")
+
+risk_df = pd.DataFrame(
+    {
+        "Category": [
+            "Vendor Dependency",
+            "Product Dependency",
+            "Country Dependency"
+        ],
+        "Share": [
+            f"{top_vendor_share:.1f}%",
+            f"{top_product_group_share:.1f}%",
+            f"{top_country_share:.1f}%"
+        ],
+        "Risk": [
+            classify_risk(top_vendor_share),
+            classify_risk(top_product_group_share),
+            classify_risk(top_country_share)
+        ]
+    }
+)
+
+st.table(risk_df)
+
+
+st.divider()
+
+st.header(
+    "🤖 Ask the Data"
+)
+
+st.caption(
+    "Ask a question about the business insights. Answers are generated from a "
+    "precomputed knowledge base and are not affected by the dashboard filters above."
+)
+
+with st.form("ask_the_data"):
+    question = st.text_input(
+        "Your question",
+        placeholder="e.g. Which country generates the most revenue?"
+    )
+    submitted = st.form_submit_button("Ask")
+
+if submitted and question.strip():
+    # Lazy import so the embedding/generation models (and their heavy
+    # dependencies) only load when a question is actually asked.
+    from rag.pipeline import answer_question
+
+    with st.spinner("Thinking..."):
+        answer, results = answer_question(question)
+
+    st.success(answer)
+
+    with st.expander(f"Sources ({len(results)})"):
+        for doc, distance in results:
+            st.markdown(f"- `{distance:.3f}` — {doc}")

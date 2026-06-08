@@ -243,3 +243,112 @@ def spike_shipment_chart(shipment_df):
     return fig
 
 
+def product_group_chart(df):
+
+    chart_df = df.head(10).copy()
+
+    chart_df["revenue_millions"] = (
+        chart_df["line_item_value"] / 1_000_000
+    )
+
+    fig = px.bar(
+        chart_df,
+        x="product_group",
+        y="revenue_millions",
+        title="Top 10 Product Groups by Revenue (Millions USD)"
+    )
+
+    fig.update_layout(
+        xaxis_title="Product Group",
+        yaxis_title="Revenue (Millions USD)"
+    )
+
+    fig.update_xaxes(
+        tickangle=-30
+    )
+
+    return fig
+
+
+def vendor_pareto_chart(df):
+
+    # Cumulative concentration curve across all vendors, ranked by revenue
+
+    chart_df = df.copy()
+
+    chart_df["vendor_rank"] = range(1, len(chart_df) + 1)
+
+    fig = px.line(
+        chart_df,
+        x="vendor_rank",
+        y="cumulative_pct",
+        markers=True,
+        title="Vendor Revenue Contribution"
+    )
+
+    fig.update_layout(
+        xaxis_title="Vendor Rank",
+        yaxis_title="Cumulative Revenue %"
+    )
+
+    return fig
+
+
+def country_share_chart(df):
+
+    chart_df = df.head(10).copy()
+
+    chart_df["share_label"] = (
+        chart_df["revenue_share_pct"]
+        .round(1)
+        .astype(str)
+        + "%"
+    )
+
+    fig = px.bar(
+        chart_df,
+        x="country",
+        y="revenue_share_pct",
+        text="share_label",
+        title="Top 10 Countries by Revenue Share"
+    )
+
+    fig.update_layout(
+        xaxis_title="Country",
+        yaxis_title="Revenue Share (%)"
+    )
+
+    fig.update_xaxes(
+        tickangle=-30
+    )
+
+    return fig
+
+
+def product_group_share_chart(df):
+
+    chart_df = df.copy()
+
+    chart_df["share_label"] = (
+        chart_df["share_pct"]
+        .round(1)
+        .astype(str)
+        + "%"
+    )
+
+    fig = px.bar(
+        chart_df,
+        x="product_group",
+        y="share_pct",
+        text="share_label",
+        title="Product Group Revenue Share"
+    )
+
+    fig.update_layout(
+        xaxis_title="Product Group",
+        yaxis_title="Revenue Share (%)"
+    )
+
+    return fig
+
+

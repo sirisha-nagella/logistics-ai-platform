@@ -431,3 +431,36 @@ risk_df = pd.DataFrame(
 )
 
 st.table(risk_df)
+
+
+st.divider()
+
+st.header(
+    "🤖 Ask the Data"
+)
+
+st.caption(
+    "Ask a question about the business insights. Answers are generated from a "
+    "precomputed knowledge base and are not affected by the dashboard filters above."
+)
+
+with st.form("ask_the_data"):
+    question = st.text_input(
+        "Your question",
+        placeholder="e.g. Which country generates the most revenue?"
+    )
+    submitted = st.form_submit_button("Ask")
+
+if submitted and question.strip():
+    # Lazy import so the embedding/generation models (and their heavy
+    # dependencies) only load when a question is actually asked.
+    from rag.pipeline import answer_question
+
+    with st.spinner("Thinking..."):
+        answer, results = answer_question(question)
+
+    st.success(answer)
+
+    with st.expander(f"Sources ({len(results)})"):
+        for doc, distance in results:
+            st.markdown(f"- `{distance:.3f}` — {doc}")

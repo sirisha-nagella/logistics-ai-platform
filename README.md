@@ -1,3 +1,15 @@
+---
+title: Logistics Revenue Intelligence
+emoji: 🚚
+colorFrom: blue
+colorTo: indigo
+sdk: streamlit
+sdk_version: 1.57.0
+app_file: app.py
+python_version: "3.12"
+pinned: false
+---
+
 # 🚚 AI-Powered Logistics Pricing & Revenue Intelligence Platform
 
 Enterprise-style logistics analytics platform for shipment pricing, revenue

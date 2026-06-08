@@ -4,3 +4,6 @@ primaryColor = "#4C8BF5"
 
 [server]
 headless = true
+# Disable the source watcher: not needed in deployment, and it logs benign
+# tracebacks when it probes transformers' lazily-imported submodules.
+fileWatcherType = "none"

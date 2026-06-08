@@ -251,7 +251,8 @@ st.subheader("Country Revenue Share")
 
 st.plotly_chart(
     country_share_chart(country_df),
-    width="stretch"
+    width="stretch",
+    key="country_share_drivers"
 )
 
 
@@ -355,7 +356,8 @@ st.subheader("Top 10 Countries by Revenue %")
 
 st.plotly_chart(
     country_share_chart(country_df),
-    width="stretch"
+    width="stretch",
+    key="country_share_top10"
 )
 
 st.subheader("Product Group Revenue Share")

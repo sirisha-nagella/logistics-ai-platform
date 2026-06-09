@@ -1,7 +1,7 @@
 # 🚚 AI-Powered Logistics Pricing & Revenue Intelligence Platform
 
-Enterprise-style logistics analytics platform for shipment pricing, revenue
-forecasting, explainable AI, and RAG-powered natural-language business
+An end-to-end, real-world logistics analytics platform for shipment pricing,
+revenue forecasting, explainable AI, and RAG-powered natural-language business
 intelligence.
 
 ## Project Summary
